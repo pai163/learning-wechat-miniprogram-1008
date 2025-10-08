@@ -1,0 +1,41 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/tasks/tasks",
+    "pages/rewards/rewards",
+    "pages/stats/stats"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#fff",
+    "navigationBarTitleText": "学习骰子",
+    "navigationBarTextStyle": "black"
+  },
+  "tabBar": {
+    "color": "#999",
+    "selectedColor": "#4ECDC4",
+    "backgroundColor": "#fff",
+    "list": [
+      {
+        "pagePath": "pages/tasks/tasks",
+        "text": "任务",
+        "iconPath": "assets/images/tasks.png",
+        "selectedIconPath": "assets/images/tasks-active.png"
+      },
+      {
+        "pagePath": "pages/rewards/rewards",
+        "text": "奖励",
+        "iconPath": "assets/images/rewards.png",
+        "selectedIconPath": "assets/images/rewards-active.png"
+      },
+      {
+        "pagePath": "pages/stats/stats",
+        "text": "学习战报",
+        "iconPath": "assets/images/stats.png",
+        "selectedIconPath": "assets/images/stats-active.png"
+      }
+    ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

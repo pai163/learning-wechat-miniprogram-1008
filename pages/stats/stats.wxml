@@ -1,0 +1,57 @@
+<!-- pages/stats/stats.wxml -->
+<view class="container">
+  <!-- 顶部统计卡片 -->
+  <view class="stats-cards">
+    <view class="stat-card task-stat">
+      <view class="stat-icon">📝</view>
+      <view class="stat-info">
+        <text class="stat-value">{{completedTasksCount}}</text>
+        <text class="stat-label">完成任务</text>
+      </view>
+    </view>
+    
+    <view class="stat-card fragment-stat">
+      <view class="stat-icon">💎</view>
+      <view class="stat-info">
+        <text class="stat-value">{{totalFragments}}</text>
+        <text class="stat-label">获得碎片</text>
+      </view>
+    </view>
+    
+    <view class="stat-card exchange-stat">
+      <view class="stat-icon">🎁</view>
+      <view class="stat-info">
+        <text class="stat-value">{{exchangedRewardsCount}}</text>
+        <text class="stat-label">兑换奖励</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 学习记录列表 -->
+  <view class="learning-history">
+    <text class="section-title">最近学习记录</text>
+    <view class="history-list">
+      <block wx:if="learningRecords.length > 0">
+        <view wx:for="{{learningRecords}}" wx:key="index" class="history-item">
+          <view class="history-icon">{{item.icon}}</view>
+          <view class="history-content">
+            <text class="history-title">{{item.title}}</text>
+          </view>
+          <text class="history-date">{{formatFullDate(item.date)}}</text>
+        </view>
+      </block>
+      <view wx:else class="empty-message">
+        <text>暂无学习记录</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 图表区域 -->
+  <view class="chart-section">
+    <text class="section-title">学习趋势</text>
+    <canvas 
+      canvas-id="learningChart" 
+      class="learning-chart"
+    ></canvas>
+  </view>
+</view>

@@ -1,0 +1,104 @@
+<!-- pages/tasks/tasks.wxml -->
+<view class="container">
+  <!-- 顶部当前任务卡片 -->
+  <view class="current-task-card gradient-secondary rounded-2xl p-6 mb-6 shadow-lg">
+    <view class="text-center">
+      <text id="current-task" class="task-title text-gray-700 mb-4">点击骰子开始学习任务</text>
+      <!-- 骰子 -->
+      <view id="task-dice" class="dice-container w-48 h-48 bg-white rounded-xl mx-auto mb-6 cursor-pointer shadow-lg" bindtap="regenerateTask">
+        <!-- 静态骰子 - 任务tab使用secondary颜色 -->
+        <view class="dice dice-task w-full h-full relative">
+          <view class="dice-dot dice-dot-1"></view>
+          <view class="dice-dot dice-dot-2"></view>
+          <view class="dice-dot dice-dot-3"></view>
+          <view class="dice-dot dice-dot-4"></view>
+          <view class="dice-dot dice-dot-5"></view>
+          <view class="dice-dot dice-dot-6"></view>
+          <view class="dice-dot dice-dot-7"></view>
+        </view>
+      </view>
+      <view class="button-group flex justify-center space-x-4">
+        <button id="regenerate-task" class="bg-white text-secondary px-6 py-3 rounded-full font-bold shadow-md" bindtap="regenerateTask">
+          重新生成任务
+        </button>
+        <button id="complete-task" class="gradient-primary text-white px-6 py-3 rounded-full font-bold shadow-md" bindtap="completeTask">
+          完成任务
+        </button>
+      </view>
+    </view>
+  </view>
+  
+  <!-- 任务列表标题 -->
+  <view class="list-header flex justify-between items-center mb-4">
+    <text class="title text-xl font-bold">任务列表</text>
+    <button id="add-task" class="bg-accent hover:bg-opacity-90 text-white px-4 py-2 rounded-full font-medium flex items-center" bindtap="addTask">
+      <text class="icon mr-2">+</text> 添加任务
+    </button>
+  </view>
+  
+  <!-- 任务列表 -->
+  <view id="task-list" class="task-list space-y-4">
+    <!-- 任务项将在JS中动态渲染 -->
+  </view>
+</view>
+
+<!-- 任务编辑弹窗 -->
+<view id="task-modal" class="modal fixed inset-0 bg-black/50 flex items-center justify-center z-50" wx:if="{{showEditModal}}">
+  <view class="modal-content bg-white rounded-2xl p-6 w-10/12 max-w-md mx-auto shadow-2xl">
+    <text id="modal-title" class="modal-title text-xl font-bold mb-4">{{modalTitle}}</text>
+    <input id="task-name" type="text" placeholder="请输入任务名称" class="task-input w-full px-4 py-3 border border-gray-300 rounded-lg mb-4" value="{{editTaskName}}" bindinput="onTaskNameInput"/>
+    <view class="modal-buttons flex justify-end space-x-3">
+      <button id="cancel-modal" class="cancel-btn px-4 py-2 bg-gray-200 rounded-lg font-medium" bindtap="closeEditModal">
+        取消
+      </button>
+      <button id="save-task" class="save-btn px-4 py-2 gradient-primary text-white rounded-lg font-medium" bindtap="saveTask">
+        保存
+      </button>
+    </view>
+  </view>
+</view>
+
+<!-- 骰子动画弹窗 -->
+<view id="dice-animation-modal" class="modal fixed inset-0 bg-black/80 flex items-center justify-center z-50" wx:if="{{showDiceAnimation}}">
+  <view class="text-center">
+    <view id="dice-animation" class="w-64 h-64 bg-white rounded-xl mx-auto mb-6 flex items-center justify-center animate-spin">
+      <text class="fa fa-dice text-8xl text-accent"></text>
+    </view>
+    <text class="text-white text-lg">正在随机选择任务...</text>
+  </view>
+</view>
+
+<!-- 成功提示弹窗 -->
+<view id="success-toast" class="toast fixed top-20 left-1/2 transform -translate-x-1/2 bg-success text-white px-6 py-3 rounded-full shadow-lg flex items-center z-50" wx:if="{{showToast}}">
+  <text class="fa fa-check-circle mr-2"></text>
+  <text id="toast-message">{{toastMessage}}</text>
+</view>
+
+<!-- 任务完成弹窗 -->
+<view id="task-complete-modal" class="modal fixed inset-0 bg-black/50 flex items-center justify-center z-50" wx:if="{{showTaskCompleteModal}}">
+  <view class="modal-content bg-white rounded-2xl p-6 w-10/12 max-w-md mx-auto shadow-2xl">
+    <view class="text-center">
+      <text class="modal-title text-xl font-bold mb-6 text-success">任务完成</text>
+      <text class="congrats-text text-gray-600 mb-8 text-lg">🎉快去奖励区领取奖励吧！</text>
+      <button id="confirm-complete" class="confirm-btn px-6 py-2 gradient-primary text-white rounded-lg font-medium w-full" bindtap="confirmComplete">
+        确定
+      </button>
+    </view>
+  </view>
+</view>
+
+<!-- 删除确认弹窗 -->
+<view id="delete-confirm-modal" class="modal fixed inset-0 bg-black/50 flex items-center justify-center z-50" wx:if="{{showDeleteConfirm}}">
+  <view class="modal-content bg-white rounded-2xl p-6 w-10/12 max-w-md mx-auto shadow-2xl">
+    <text class="modal-title text-xl font-bold mb-4 text-center">确认删除</text>
+    <text class="delete-confirm-text text-gray-600 text-center mb-6">{{deleteConfirmText}}</text>
+    <view class="modal-buttons flex space-x-3">
+      <button id="cancel-delete" class="cancel-btn flex-1 px-4 py-2 bg-gray-200 rounded-lg font-medium" bindtap="cancelDelete">
+        取消
+      </button>
+      <button id="confirm-delete" class="delete-btn flex-1 px-4 py-2 bg-danger text-white rounded-lg font-medium" bindtap="confirmDelete">
+        确定删除
+      </button>
+    </view>
+  </view>
+</view>

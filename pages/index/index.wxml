@@ -1,0 +1,39 @@
+<!-- pages/index/index.wxml -->
+<view class="container">
+  <view class="welcome-card gradient-secondary rounded-2xl p-6 mb-6 shadow-lg">
+    <text class="welcome-text text-white text-xl font-bold text-center">欢迎使用学习骰子</text>
+    <text class="welcome-subtitle text-white/80 text-center mt-2">通过随机任务保持学习动力</text>
+  </view>
+  
+  <view class="feature-cards">
+    <view class="feature-card bg-white rounded-xl p-5 shadow-card">
+      <view class="feature-icon bg-secondary/20 w-12 h-12 rounded-full flex items-center justify-center mb-4">
+        <text class="text-secondary text-xl">🎲</text>
+      </view>
+      <text class="feature-title text-lg font-semibold mb-2">随机任务生成</text>
+      <text class="feature-desc text-gray-500">点击骰子获取今日学习任务</text>
+    </view>
+    
+    <view class="feature-card bg-white rounded-xl p-5 shadow-card">
+      <view class="feature-icon bg-primary/20 w-12 h-12 rounded-full flex items-center justify-center mb-4">
+        <text class="text-primary text-xl">🎁</text>
+      </view>
+      <text class="feature-title text-lg font-semibold mb-2">奖励系统</text>
+      <text class="feature-desc text-gray-500">完成任务收集碎片兑换奖励</text>
+    </view>
+    
+    <view class="feature-card bg-white rounded-xl p-5 shadow-card">
+      <view class="feature-icon bg-accent/20 w-12 h-12 rounded-full flex items-center justify-center mb-4">
+        <text class="text-accent text-xl">📊</text>
+      </view>
+      <text class="feature-title text-lg font-semibold mb-2">学习统计</text>
+      <text class="feature-desc text-gray-500">查看学习进度和成就</text>
+    </view>
+  </view>
+  
+  <view class="action-buttons">
+    <button class="gradient-primary text-white py-3 rounded-full font-bold shadow-md hover:shadow-lg" bindtap="goToTasks">
+      开始学习
+    </button>
+  </view>
+</view>

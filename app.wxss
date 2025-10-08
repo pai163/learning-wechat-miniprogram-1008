@@ -1,0 +1,109 @@
+/* app.wxss */
+@import './assets/styles/tailwind.wxss';
+
+/* 全局样式变量 */
+page {
+  --primary: #FF6B6B;
+  --secondary: #4ECDC4;
+  --accent: #FFD166;
+  --success: #06D6A0;
+  --warning: #FF9F1C;
+  --danger: #EF476F;
+  --light: #F7FFF7;
+  --dark: #292F36;
+  font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Helvetica Neue', sans-serif;
+  background-color: var(--light);
+  color: var(--dark);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 自定义样式 */
+.shadow-card {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.text-shadow {
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.gradient-primary {
+  background: linear-gradient(135deg, #FF6B6B 0%, #EF476F 100%);
+}
+
+.gradient-secondary {
+  background: linear-gradient(135deg, #4ECDC4 0%, #06D6A0 100%);
+}
+
+.gradient-accent {
+  background: linear-gradient(135deg, #FFD166 0%, #FF9F1C 100%);
+}
+
+/* 骰子样式 */
+.dice {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  border-radius: 12px;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
+  background-color: white;
+}
+
+/* 骰子点样式 */
+.dice-dot {
+  position: absolute;
+  width: 18%;
+  height: 18%;
+  border-radius: 50%;
+}
+
+/* 任务骰子 - 使用secondary颜色 */
+.dice-task .dice-dot {
+  background-color: #4ECDC4;
+}
+
+/* 奖励骰子 - 使用primary颜色 */
+.dice-reward .dice-dot {
+  background-color: #FF6B6B;
+}
+
+/* 骰子点的位置 */
+.dice-dot-1 {
+  top: 20%;
+  left: 20%;
+}
+
+.dice-dot-2 {
+  top: 20%;
+  right: 20%;
+}
+
+.dice-dot-3 {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.dice-dot-4 {
+  bottom: 20%;
+  left: 20%;
+}
+
+.dice-dot-5 {
+  bottom: 20%;
+  right: 20%;
+}
+
+.dice-dot-6 {
+  top: 50%;
+  left: 20%;
+  transform: translateY(-50%);
+}
+
+.dice-dot-7 {
+  top: 50%;
+  right: 20%;
+  transform: translateY(-50%);
+}

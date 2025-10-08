@@ -1,0 +1,76 @@
+/* pages/index/index.wxss */
+.container {
+  padding: 40rpx;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.welcome-card {
+  margin-bottom: 40rpx;
+  text-align: center;
+}
+
+.welcome-text {
+  font-size: 36rpx;
+  font-weight: bold;
+}
+
+.welcome-subtitle {
+  font-size: 28rpx;
+  margin-top: 16rpx;
+}
+
+.feature-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 30rpx;
+  margin-bottom: 60rpx;
+  flex: 1;
+}
+
+.feature-card {
+  padding: 40rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.feature-icon {
+  width: 96rpx;
+  height: 96rpx;
+  margin-bottom: 32rpx;
+}
+
+.feature-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  margin-bottom: 16rpx;
+}
+
+.feature-desc {
+  font-size: 28rpx;
+  color: #666;
+}
+
+.action-buttons {
+  margin-top: auto;
+}
+
+.gradient-primary {
+  background: linear-gradient(135deg, #FF6B6B 0%, #EF476F 100%);
+}
+
+.gradient-secondary {
+  background: linear-gradient(135deg, #4ECDC4 0%, #06D6A0 100%);
+}
+
+.shadow-lg {
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.shadow-card {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}

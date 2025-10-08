@@ -1,0 +1,108 @@
+<!-- pages/rewards/rewards.wxml -->
+<view class="container">
+  <!-- 碎片数量显示 -->
+  <view class="token-display">
+    <text class="token-title">我的学习碎片</text>
+    <text class="token-count">{{fragments}} 个</text>
+  </view>
+
+  <!-- 奖励兑换列表 -->
+  <view class="rewards-section">
+    <view class="section-header">
+      <text class="section-title">奖励兑换</text>
+      <button class="add-reward-btn" bindtap="openAddRewardModal">+ 添加奖励</button>
+    </view>
+
+    <view class="rewards-list">
+      <block wx:if="rewards.length > 0">
+        <view wx:for="{{rewards}}" wx:key="id" class="reward-item">
+          <view class="reward-info">
+            <text class="reward-name">{{item.name}}</text>
+            <text class="reward-cost">需要 {{item.cost}} 个碎片</text>
+          </view>
+          <button 
+            class="exchange-btn {{fragments >= item.cost ? 'enabled' : 'disabled'}}"
+            bindtap="exchangeReward" 
+            data-id="{{item.id}}"
+            disabled="{{fragments < item.cost}}"
+          >
+            兑换
+          </button>
+        </view>
+      </block>
+      <view wx:else class="empty-message">
+        <text>暂无奖励，点击上方按钮添加吧！</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 兑换记录 -->
+  <view class="exchange-history">
+    <text class="section-title">兑换记录</text>
+    <view class="history-list">
+      <block wx:if="exchangeRecords.length > 0">
+        <view wx:for="{{exchangeRecords}}" wx:key="index" class="history-item">
+          <view class="history-info">
+            <text class="history-reward">{{item.rewardName}}</text>
+            <text class="history-date">{{item.date}}</text>
+          </view>
+        </view>
+      </block>
+      <view wx:else class="empty-message">
+        <text>暂无兑换记录</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 添加奖励弹窗 -->
+  <view class="modal" wx:if="showAddRewardModal" bindtap="closeAddRewardModal">
+    <view class="modal-content" catchtap="stopPropagation">
+      <text class="modal-title">添加奖励</text>
+      <input 
+        class="reward-input" 
+        placeholder="输入奖励名称" 
+        bindinput="onRewardNameInput" 
+        value="{{newRewardName}}"
+      />
+      <input 
+        class="cost-input" 
+        placeholder="输入所需碎片数量" 
+        type="number" 
+        bindinput="onRewardCostInput" 
+        value="{{newRewardCost}}"
+      />
+      <view class="modal-buttons">
+        <button class="cancel-btn" bindtap="closeAddRewardModal">取消</button>
+        <button class="save-btn" bindtap="saveReward">保存</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 兑换确认弹窗 -->
+  <view class="modal" wx:if="showExchangeConfirmModal" bindtap="closeExchangeConfirmModal">
+    <view class="modal-content" catchtap="stopPropagation">
+      <text class="modal-title">确认兑换</text>
+      <text class="confirm-text">确定要兑换 "{{selectedReward.name}}" 吗？
+        需要消耗 {{selectedReward.cost}} 个碎片</text>
+      <view class="modal-buttons">
+        <button class="cancel-btn" bindtap="closeExchangeConfirmModal">取消</button>
+        <button class="confirm-btn" bindtap="confirmExchange">确认兑换</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 兑换成功弹窗 -->
+  <view class="modal" wx:if="showExchangeSuccessModal" bindtap="closeExchangeSuccessModal">
+    <view class="modal-content" catchtap="stopPropagation">
+      <text class="success-icon">🎉</text>
+      <text class="success-text">兑换成功！
+        恭喜你获得 "{{selectedReward.name}}"</text>
+      <button class="confirm-btn" bindtap="closeExchangeSuccessModal">确定</button>
+    </view>
+  </view>
+
+  <!-- 提示弹窗 -->
+  <view class="toast" wx:if="showToast">
+    <text>{{toastMessage}}</text>
+  </view>
+</view>

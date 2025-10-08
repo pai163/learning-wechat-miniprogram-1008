@@ -1,0 +1,144 @@
+/* pages/stats/stats.wxss */
+.container {
+  padding: 32rpx;
+  box-sizing: border-box;
+  flex: 1;
+}
+
+/* 统计卡片区域 */
+.stats-cards {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 48rpx;
+  gap: 24rpx;
+}
+
+.stat-card {
+  flex: 1;
+  background-color: white;
+  border-radius: 24rpx;
+  padding: 40rpx;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.task-stat {
+  background: linear-gradient(135deg, #4ECDC4 0%, #06D6A0 100%);
+  color: white;
+}
+
+.fragment-stat {
+  background: linear-gradient(135deg, #FFD166 0%, #FF9F1C 100%);
+  color: white;
+}
+
+.exchange-stat {
+  background: linear-gradient(135deg, #FF6B6B 0%, #EF476F 100%);
+  color: white;
+}
+
+.stat-icon {
+  font-size: 64rpx;
+  margin-bottom: 16rpx;
+}
+
+.stat-info {
+  text-align: center;
+}
+
+.stat-value {
+  font-size: 48rpx;
+  font-weight: bold;
+  display: block;
+}
+
+.stat-label {
+  font-size: 24rpx;
+  opacity: 0.9;
+}
+
+/* 学习记录区域 */
+.learning-history {
+  background-color: #f8f9fa;
+  border-radius: 24rpx;
+  padding: 32rpx;
+  margin-bottom: 48rpx;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.section-title {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 32rpx;
+  display: block;
+}
+
+.history-list {
+  gap: 24rpx;
+}
+
+.history-item {
+  background-color: white;
+  border-radius: 16rpx;
+  padding: 28rpx;
+  margin-bottom: 16rpx;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+}
+
+.history-icon {
+  font-size: 48rpx;
+}
+
+.history-content {
+  flex: 1;
+}
+
+.history-title {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #333;
+  display: block;
+  margin-bottom: 8rpx;
+}
+
+.history-subtitle {
+  font-size: 24rpx;
+  color: #666;
+}
+
+.history-date {
+  font-size: 24rpx;
+  color: #999;
+}
+
+/* 空状态提示 */
+.empty-message {
+  text-align: center;
+  padding: 64rpx 0;
+  color: #999;
+  font-size: 28rpx;
+}
+
+/* 图表区域 */
+.chart-section {
+  background-color: #f8f9fa;
+  border-radius: 24rpx;
+  padding: 32rpx;
+  margin-bottom: 120rpx;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.learning-chart {
+  width: 100%;
+  height: 300rpx;
+  background-color: white;
+  border-radius: 16rpx;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}

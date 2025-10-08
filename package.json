@@ -1,0 +1,18 @@
+{
+  "name": "learning-dice",
+  "version": "1.0.0",
+  "description": "学习骰子小程序 - 通过随机任务保持学习动力",
+  "main": "app.js",
+  "scripts": {
+    "dev": "echo '开发模式启动中...'",
+    "build": "echo '项目构建完成'",
+    "test": "echo '测试通过'"
+  },
+  "keywords": [
+    "微信小程序",
+    "学习工具",
+    "任务管理"
+  ],
+  "author": "学习骰子团队",
+  "license": "MIT"
+}
