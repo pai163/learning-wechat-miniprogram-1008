@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学习骰子 - 专注学习的小程序</title>
+    <!-- 引入Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <!-- 引入Chart.js用于数据可视化 -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+    
+    <!-- Tailwind配置 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#FF6B6B',
+                        secondary: '#4ECDC4',
+                        accent: '#FFD166',
+                        success: '#06D6A0',
+                        warning: '#FF9F1C',
+                        danger: '#EF476F',
+                        light: '#F7FFF7',
+                        dark: '#292F36'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    animation: {
+                        'bounce-slow': 'bounce 2s infinite',
+                        'spin-slow': 'spin 3s linear infinite',
+                        'float': 'float 3s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        }
+                    }
+                },
+            }
+        }
+    </script>
+    
+    <!-- 自定义样式 -->
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .shadow-card {
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            }
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
+            .gradient-primary {
+                background: linear-gradient(135deg, #FF6B6B 0%, #EF476F 100%);
+            }
+            .gradient-secondary {
+                background: linear-gradient(135deg, #4ECDC4 0%, #06D6A0 100%);
+            }
+            .gradient-accent {
+                background: linear-gradient(135deg, #FFD166 0%, #FF9F1C 100%);
+            }
+        }
+    </style>
+</head>
+<body class="bg-light font-sans text-dark min-h-screen flex flex-col">
+    <!-- 主容器 -->
+    <div id="app" class="flex-1 flex flex-col">
+        <!-- 页面内容区域 -->
+        <div id="page-content" class="flex-1 p-4">
+            <!-- 任务Tab内容 -->
+            <div id="tasks-tab" class="h-full flex flex-col">
+                <!-- 顶部当前任务卡片 -->
+                <div class="bg-gradient-to-r from-secondary to-success rounded-2xl p-6 mb-6 shadow-lg transform transition-all hover:scale-[1.01]">
+                    <div class="text-center">
+                        <h2 id="current-task" class="text-gray-700 mb-2">点击骰子开始学习任务</h2>
+                        <!-- 骰子 -->
+                        <div id="task-dice" class="w-24 h-24 bg-white rounded-xl mx-auto mb-6 cursor-pointer shadow-lg transition-all hover:scale-110 animate-float flex items-center justify-center">
+                            <i class="fa fa-dice text-4xl text-secondary"></i>
+                        </div>
+                        <div class="flex justify-center space-x-4">
+                            <button id="regenerate-task" class="bg-white text-secondary px-6 py-3 rounded-full font-bold shadow-md hover:shadow-lg transition-all transform hover:-translate-y-1">
+                                重新生成任务
+                            </button>
+                            <button id="complete-task" class="gradient-primary text-white px-6 py-3 rounded-full font-bold shadow-md hover:shadow-lg transition-all transform hover:-translate-y-1">
+                                完成任务
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 任务列表标题 -->
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-bold">任务列表</h2>
+                    <button id="add-task" class="bg-accent hover:bg-opacity-90 text-white px-4 py-2 rounded-full font-medium flex items-center transition-all transform hover:scale-105">
+                        <i class="fa fa-plus mr-2"></i> 添加任务
+                    </button>
+                </div>
+                
+                <!-- 任务列表 -->
+                <div id="task-list" class="space-y-4 overflow-y-auto flex-1">
+                    <!-- 任务项 - 进行中 -->
+                    <div class="bg-white rounded-xl p-4 shadow-card flex justify-between items-center border-l-4 border-secondary">
+                        <div class="flex items-center">
+                            <span class="bg-warning/20 text-warning text-xs px-2 py-1 rounded-full mr-3">进行中</span>
+                            <span class="font-medium">测试2</span>
+                        </div>
+                        <button class="text-gray-500 hover:text-primary transition-colors">
+                            <i class="fa fa-pencil"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- 任务项 - 已完成 -->
+                    <div class="bg-white rounded-xl p-4 shadow-card flex justify-between items-center border-l-4 border-success">
+                        <div class="flex items-center">
+                            <span class="bg-success/20 text-success text-xs px-2 py-1 rounded-full mr-3">已完成</span>
+                            <span class="font-medium">写完文献综述部分</span>
+                        </div>
+                        <div class="flex space-x-3">
+                            <button class="text-gray-500 hover:text-primary transition-colors">
+                                <i class="fa fa-pencil"></i>
+                            </button>
+                            <button class="text-gray-500 hover:text-danger transition-colors">
+                                <i class="fa fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- 任务项 - 未开始 -->
+                    <div class="bg-white rounded-xl p-4 shadow-card flex justify-between items-center border-l-4 border-gray-300">
+                        <div class="flex items-center">
+                            <span class="bg-gray-200 text-gray-600 text-xs px-2 py-1 rounded-full mr-3">未开始</span>
+                            <span class="font-medium">开发小程序</span>
+                        </div>
+                        <div class="flex space-x-3">
+                            <button class="text-gray-500 hover:text-primary transition-colors">
+                                <i class="fa fa-pencil"></i>
+                            </button>
+                            <button class="text-gray-500 hover:text-danger transition-colors">
+                                <i class="fa fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- 任务项 - 未开始 -->
+                    <div class="bg-white rounded-xl p-4 shadow-card flex justify-between items-center border-l-4 border-gray-300">
+                        <div class="flex items-center">
+                            <span class="bg-gray-200 text-gray-600 text-xs px-2 py-1 rounded-full mr-3">未开始</span>
+                            <span class="font-medium">复习英语单词</span>
+                        </div>
+                        <div class="flex space-x-3">
+                            <button class="text-gray-500 hover:text-primary transition-colors">
+                                <i class="fa fa-pencil"></i>
+                            </button>
+                            <button class="text-gray-500 hover:text-danger transition-colors">
+                                <i class="fa fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- 任务项 - 未开始 -->
+                    <div class="bg-white rounded-xl p-4 shadow-card flex justify-between items-center border-l-4 border-gray-300">
+                        <div class="flex items-center">
+                            <span class="bg-gray-200 text-gray-600 text-xs px-2 py-1 rounded-full mr-3">未开始</span>
+                            <span class="font-medium">准备演讲材料</span>
+                        </div>
+                        <div class="flex space-x-3">
+                            <button class="text-gray-500 hover:text-primary transition-colors">
+                                <i class="fa fa-pencil"></i>
+                            </button>
+                            <button class="text-gray-500 hover:text-danger transition-colors">
+                                <i class="fa fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 奖励Tab内容 -->
+            <div id="rewards-tab" class="hidden h-full flex flex-col">
+                <!-- 骰子奖励区域 -->
+                <div class="bg-gradient-to-r from-pink-400 to-orange-400 rounded-2xl p-6 mb-6 shadow-lg text-center">
+                    <h2 class="text-white mb-2">点击骰子获取奖励</h2>
+                    <p class="text-white/80 mb-4">剩余投掷次数：<span id="remaining-rolls">1</span> 次</p>
+                    
+                    <!-- 骰子 -->
+                    <div id="reward-dice" class="w-24 h-24 bg-white rounded-xl mx-auto mb-4 cursor-pointer shadow-lg transition-all hover:scale-110 animate-float flex items-center justify-center">
+                        <i class="fa fa-dice text-4xl text-primary"></i>
+                    </div>
+                </div>
+                
+                <!-- 碎片统计 -->
+                <div class="bg-white rounded-xl p-5 mb-6 shadow-card">
+                    <h3 class="text-lg font-semibold mb-2">当前碎片</h3>
+                    <div class="flex justify-between items-end">
+                        <div>
+                            <span id="total-fragments" class="text-3xl font-bold text-primary">25</span>
+                            <span class="text-gray-500 ml-1">个</span>
+                        </div>
+                        <span class="text-gray-500 text-sm">已使用 <span id="used-fragments">5</span> 个</span>
+                    </div>
+                </div>
+                
+                <!-- 奖励兑换 -->
+                <div class="mb-4">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-semibold">奖励兑换</h3>
+                        <button id="add-reward" class="text-primary hover:text-primary/80 text-sm flex items-center transition-colors">
+                            <i class="fa fa-plus mr-1"></i> 添加奖励
+                        </button>
+                    </div>
+                    
+                    <!-- 奖励列表 -->
+                    <div id="reward-list" class="space-y-3">
+                        <!-- 奖励项 -->
+                        <div class="bg-white rounded-xl p-4 shadow-card flex justify-between items-center">
+                            <div>
+                                <p class="font-medium">休息30分钟</p>
+                                <p class="text-gray-500 text-sm">需要 1 个碎片</p>
+                            </div>
+                            <button class="gradient-primary text-white px-4 py-1.5 rounded-full text-sm font-medium shadow-sm hover:shadow transition-all">
+                                兑换
+                            </button>
+                        </div>
+                        
+                        <!-- 奖励项 -->
+                        <div class="bg-white rounded-xl p-4 shadow-card flex justify-between items-center">
+                            <div>
+                                <p class="font-medium">奖励一个雪糕</p>
+                                <p class="text-gray-500 text-sm">需要 3 个碎片</p>
+                            </div>
+                            <button class="gradient-primary text-white px-4 py-1.5 rounded-full text-sm font-medium shadow-sm hover:shadow transition-all">
+                                兑换
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 兑换记录 -->
+                <div class="flex-1">
+                    <h3 class="text-lg font-semibold mb-4">兑换记录</h3>
+                    <div id="exchange-history" class="space-y-3">
+                        <!-- 兑换记录项 -->
+                        <div class="bg-white rounded-xl p-4 shadow-card flex justify-between items-center">
+                            <div>
+                                <div class="flex items-center mb-1">
+                                    <i class="fa fa-gift text-accent mr-2"></i>
+                                    <p class="font-medium">奖励一个雪糕</p>
+                                </div>
+                                <p class="text-gray-500 text-sm">2025/10/07 下午5:36:28</p>
+                            </div>
+                            <div class="flex items-center text-danger text-sm">
+                                <i class="fa fa-diamond mr-1"></i>
+                                <span>消耗3碎片</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 学习战报Tab内容 -->
+            <div id="stats-tab" class="hidden h-full flex flex-col">
+                <!-- 今日概览 -->
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div class="bg-white rounded-xl p-4 shadow-card text-center">
+                        <p class="text-gray-500 mb-2">今日完成任务</p>
+                        <p class="text-2xl font-bold text-green-500">0</p>
+                    </div>
+                    <div class="bg-white rounded-xl p-4 shadow-card text-center">
+                        <p class="text-gray-500 mb-2">今日获得碎片</p>
+                        <p class="text-2xl font-bold text-green-500">2</p>
+                    </div>
+                    <div class="bg-white rounded-xl p-4 shadow-card text-center">
+                        <p class="text-gray-500 mb-2">连续学习</p>
+                        <p class="text-2xl font-bold text-green-500">1</p>
+                    </div>
+                    <div class="bg-white rounded-xl p-4 shadow-card text-center">
+                        <p class="text-gray-500 mb-2">本周碎片</p>
+                        <p class="text-2xl font-bold text-green-500">14</p>
+                    </div>
+                </div>
+                
+                <!-- 本周任务完成趋势 -->
+                <div class="bg-white rounded-xl p-5 mb-6 shadow-card">
+                    <h3 class="text-lg font-semibold mb-4">本周任务完成趋势</h3>
+                    <div class="h-48">
+                        <canvas id="weekly-tasks-chart"></canvas>
+                    </div>
+                </div>
+                
+                <!-- 本周碎片获取趋势 -->
+                <div class="bg-white rounded-xl p-5 mb-6 shadow-card">
+                    <h3 class="text-lg font-semibold mb-4">本周碎片获取趋势</h3>
+                    <div class="h-48">
+                        <canvas id="weekly-fragments-chart"></canvas>
+                    </div>
+                </div>
+                
+                <!-- 本月统计 -->
+                <div class="bg-white rounded-xl p-5 mb-6 shadow-card">
+                    <h3 class="text-lg font-semibold mb-4">本月统计</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="text-center">
+                            <p class="text-gray-500 mb-1">总完成任务</p>
+                            <div class="flex items-center justify-center h-10">
+                                <i class="fa fa-bullseye text-amber-400 mr-1 w-5 text-center"></i>
+                                <p class="text-2xl font-bold">11</p>
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <p class="text-gray-500 mb-1">总获得碎片</p>
+                            <div class="flex items-center justify-center h-10">
+                                <i class="fa fa-diamond text-amber-400 mr-1 w-5 text-center"></i>
+                                <p class="text-2xl font-bold">30</p>
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <p class="text-gray-500 mb-1">兑换次数</p>
+                            <div class="flex items-center justify-center h-10">
+                                <i class="fa fa-gift text-amber-400 mr-1 w-5 text-center"></i>
+                                <p class="text-2xl font-bold">0</p>
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <p class="text-gray-500 mb-1">最高单日完成</p>
+                            <div class="flex items-center justify-center h-10">
+                                <i class="fa fa-trophy text-amber-400 mr-1 w-5 text-center"></i>
+                                <p class="text-2xl font-bold">10</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 最近完成任务 -->
+                <div class="flex-1">
+                    <h3 class="text-lg font-semibold mb-4">最近完成任务</h3>
+                    <div id="recent-tasks" class="space-y-3">
+                        <!-- 完成任务项 -->
+                        <div class="bg-white rounded-xl p-4 shadow-card flex justify-between items-center">
+                            <div class="flex items-center">
+                                <i class="fa fa-check-circle text-success mr-3"></i>
+                                <p class="font-medium">写完文献综述部分</p>
+                            </div>
+                            <span class="text-gray-500 text-sm">2025-10-07</span>
+                        </div>
+                        <!-- 完成任务项 -->
+                        <div class="bg-white rounded-xl p-4 shadow-card flex justify-between items-center">
+                            <div class="flex items-center">
+                                <i class="fa fa-check-circle text-success mr-3"></i>
+                                <p class="font-medium">开发小程序</p>
+                            </div>
+                            <span class="text-gray-500 text-sm">2025-10-07</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 底部Tab栏 -->
+        <div class="bg-white border-t border-gray-200 py-2">
+            <div class="flex justify-around">
+                <button class="tab-button active flex flex-col items-center px-4 py-2" data-tab="tasks">
+                    <i class="fa fa-tasks text-xl text-secondary"></i>
+                    <span class="text-xs mt-1 text-secondary">任务</span>
+                </button>
+                <button class="tab-button flex flex-col items-center px-4 py-2" data-tab="rewards">
+                    <i class="fa fa-gift text-xl text-gray-400"></i>
+                    <span class="text-xs mt-1 text-gray-400">奖励</span>
+                </button>
+                <button class="tab-button flex flex-col items-center px-4 py-2" data-tab="stats">
+                    <i class="fa fa-bar-chart text-xl text-gray-400"></i>
+                    <span class="text-xs mt-1 text-gray-400">学习战报</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 任务编辑弹窗 -->
+    <div id="task-modal" class="fixed inset-0 bg-black/50 flex items-center justify-center hidden z-50">
+        <div class="bg-white rounded-2xl p-6 w-10/12 max-w-md mx-auto shadow-2xl transform transition-all animate-float">
+            <h3 id="modal-title" class="text-xl font-bold mb-4">添加任务</h3>
+            <input id="task-name" type="text" placeholder="请输入任务名称" class="w-full px-4 py-3 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-secondary">
+            <div class="flex justify-end space-x-3">
+                <button id="cancel-modal" class="px-4 py-2 bg-gray-200 rounded-lg font-medium hover:bg-gray-300 transition-colors">
+                    取消
+                </button>
+                <button id="save-task" class="px-4 py-2 gradient-primary text-white rounded-lg font-medium hover:shadow-lg transition-all">
+                    保存
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 骰子动画弹窗 -->
+    <div id="dice-animation-modal" class="fixed inset-0 bg-black/80 flex items-center justify-center hidden z-50">
+        <div class="text-center">
+            <div id="dice-animation" class="w-32 h-32 bg-white rounded-xl mx-auto mb-6 flex items-center justify-center animate-spin-slow">
+                <i class="fa fa-dice text-6xl text-accent"></i>
+            </div>
+            <p class="text-white text-lg">正在随机选择任务...</p>
+        </div>
+    </div>
+    
+    <!-- 成功提示弹窗 -->
+    <div id="success-toast" class="fixed top-10 left-1/2 transform -translate-x-1/2 bg-success text-white px-6 py-3 rounded-full shadow-lg flex items-center z-50 hidden">
+        <i class="fa fa-check-circle mr-2"></i>
+        <span id="toast-message">任务完成！快去奖励区领取奖励吧</span>
+    </div>
+    
+    <!-- 任务完成弹窗 -->
+    <div id="task-complete-modal" class="fixed inset-0 bg-black/50 flex items-center justify-center hidden z-50">
+        <div class="bg-white rounded-2xl p-6 w-10/12 max-w-md mx-auto shadow-2xl transform transition-all">
+            <div class="text-center">
+                    <h3 class="text-xl font-bold mb-6 text-success">任务完成</h3>
+                    <p class="text-gray-600 mb-8 text-lg">🎉快去奖励区领取奖励吧！</p>
+                    <button id="confirm-complete" class="px-6 py-2 gradient-primary text-white rounded-lg font-medium hover:shadow-lg transition-all w-full">
+                        确定
+                    </button>
+                </div>
+        </div>
+    </div>
+    
+    <!-- 删除确认弹窗 -->
+    <div id="delete-confirm-modal" class="fixed inset-0 bg-black/50 flex items-center justify-center hidden z-50">
+        <div class="bg-white rounded-2xl p-6 w-10/12 max-w-md mx-auto shadow-2xl transform transition-all">
+            <h3 class="text-xl font-bold mb-4 text-center">确认删除</h3>
+            <p class="text-gray-600 text-center mb-6" id="delete-confirm-text">
+                确定要删除该任务吗？
+            </p>
+            <div class="flex space-x-3">
+                <button id="cancel-delete" class="flex-1 px-4 py-2 bg-gray-200 rounded-lg font-medium hover:bg-gray-300 transition-colors">
+                    取消
+                </button>
+                <button id="confirm-delete" class="flex-1 px-4 py-2 bg-danger text-white rounded-lg font-medium hover:shadow-lg transition-all">
+                    确定删除
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 添加奖励弹窗 -->
+    <div id="reward-modal" class="fixed inset-0 bg-black/50 flex items-center justify-center hidden z-50">
+        <div class="bg-white rounded-2xl p-6 w-10/12 max-w-md mx-auto shadow-2xl transform transition-all">
+            <h3 id="reward-modal-title" class="text-xl font-bold mb-4">添加奖励</h3>
+            <input id="reward-name" type="text" placeholder="请输入奖励名称" class="w-full px-4 py-3 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-primary">
+            <input id="reward-cost" type="number" placeholder="需要的碎片数量 (默认30)" min="0" class="w-full px-4 py-3 border border-gray-300 rounded-lg mb-6 focus:outline-none focus:ring-2 focus:ring-primary">
+            <div class="flex space-x-3">
+                <button id="cancel-reward" class="flex-1 px-4 py-2 bg-gray-200 rounded-lg font-medium hover:bg-gray-300 transition-colors">
+                    取消
+                </button>
+                <button id="save-reward" class="flex-1 px-4 py-2 gradient-primary text-white rounded-lg font-medium hover:shadow-lg transition-all">
+                    确定
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 兑换确认弹窗 -->
+    <div id="exchange-confirm-modal" class="fixed inset-0 bg-black/50 flex items-center justify-center hidden z-50">
+        <div class="bg-white rounded-2xl p-6 w-10/12 max-w-md mx-auto shadow-2xl transform transition-all">
+            <h3 class="text-xl font-bold mb-4 text-center">确认兑换</h3>
+            <p class="text-gray-600 text-center mb-6" id="exchange-confirm-text">
+                确定要消耗1个碎片兑换休息30分钟吗？
+            </p>
+            <div class="flex space-x-3">
+                <button id="cancel-exchange" class="flex-1 px-4 py-2 bg-gray-200 rounded-lg font-medium hover:bg-gray-300 transition-colors">
+                    取消
+                </button>
+                <button id="confirm-exchange" class="flex-1 px-4 py-2 gradient-primary text-white rounded-lg font-medium hover:shadow-lg transition-all">
+                    确定
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- JavaScript -->
+    <script>
+        // 数据模型
+        const userData = {
+            tasks: [
+                { id: 1, name: "测试2", status: "inProgress", createTime: "2025-10-07", completeTime: null },
+                { id: 4, name: "复习英语单词", status: "pending", createTime: "2025-10-07", completeTime: null },
+                { id: 5, name: "准备演讲材料", status: "pending", createTime: "2025-10-07", completeTime: null },
+                { id: 2, name: "写完文献综述部分", status: "completed", createTime: "2025-10-07", completeTime: "2025-10-07" },
+                { id: 3, name: "开发小程序", status: "completed", createTime: "2025-10-07", completeTime: "2025-10-07" }
+            ],
+            rewards: {
+                totalFragments: 25,
+                usedFragments: 5,
+                rewardList: [
+                    { id: 1, name: "休息30分钟", cost: 1 },
+                    { id: 2, name: "奖励一个雪糕", cost: 3 }
+                ],
+                exchangeHistory: [
+                    { id: 1, rewardId: 2, rewardName: "奖励一个雪糕", cost: 3, time: "2025/10/07 下午5:36:28" }
+                ]
+            },
+            diceStats: {
+                completedTasks: 15,
+                usedRolls: 12,
+                todayRolls: 1
+            }
+        };
+        
+        // DOM元素
+        const app = document.getElementById('app');
+        const pageContent = document.getElementById('page-content');
+        const tasksTab = document.getElementById('tasks-tab');
+        const rewardsTab = document.getElementById('rewards-tab');
+        const statsTab = document.getElementById('stats-tab');
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const taskModal = document.getElementById('task-modal');
+        const rewardModal = document.getElementById('reward-modal');
+        const diceAnimationModal = document.getElementById('dice-animation-modal');
+        const successToast = document.getElementById('success-toast');
+        const taskCompleteModal = document.getElementById('task-complete-modal');
+        const regenerateTaskBtn = document.getElementById('regenerate-task');
+        const completeTaskBtn = document.getElementById('complete-task');
+        const currentTaskEl = document.getElementById('current-task');
+        const taskDice = document.getElementById('task-dice');
+        const rewardDice = document.getElementById('reward-dice');
+        const remainingRollsEl = document.getElementById('remaining-rolls');
+        
+        // Tab切换功能
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                // 移除所有active状态
+                tabButtons.forEach(btn => {
+                    btn.classList.remove('active');
+                    const icon = btn.querySelector('i');
+                    const text = btn.querySelector('span');
+                    icon.classList.remove('text-secondary', 'text-primary', 'text-accent', 'text-amber-500');
+                    text.classList.remove('text-secondary', 'text-primary', 'text-accent', 'text-amber-500');
+                    icon.classList.add('text-gray-400');
+                    text.classList.add('text-gray-400');
+                });
+                
+                // 添加当前active状态
+                button.classList.add('active');
+                const icon = button.querySelector('i');
+                const text = button.querySelector('span');
+                icon.classList.remove('text-gray-400');
+                text.classList.remove('text-gray-400');
+                
+                // 根据tab类型设置不同颜色
+                const tabType = button.getAttribute('data-tab');
+                if (tabType === 'tasks') {
+                    icon.classList.add('text-secondary');
+                    text.classList.add('text-secondary');
+                } else if (tabType === 'rewards') {
+                    icon.classList.add('text-primary');
+                    text.classList.add('text-primary');
+                } else if (tabType === 'stats') {
+                    icon.classList.add('text-amber-500');
+                    text.classList.add('text-amber-500');
+                }
+                
+                // 显示对应内容
+                tasksTab.classList.add('hidden');
+                rewardsTab.classList.add('hidden');
+                statsTab.classList.add('hidden');
+                
+                if (tabType === 'tasks') {
+                    tasksTab.classList.remove('hidden');
+                } else if (tabType === 'rewards') {
+                    rewardsTab.classList.remove('hidden');
+                } else if (tabType === 'stats') {
+                    statsTab.classList.remove('hidden');
+                }
+            });
+        });
+        
+        // 初始化图表
+        function initCharts() {
+            // 本周任务完成趋势图表
+            const weeklyTasksCtx = document.getElementById('weekly-tasks-chart').getContext('2d');
+            new Chart(weeklyTasksCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['四', '五', '六', '日', '一', '二', '三'],
+                    datasets: [{
+                        label: '完成任务数',
+                        data: [0, 0, 0, 0, 0, 10, 0],
+                        backgroundColor: '#4ECDC4',
+                        borderRadius: 8,
+                        barThickness: 24
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 5
+                            },
+                            grid: {
+                                display: true,
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+            
+            // 本周碎片获取趋势图表
+            const weeklyFragmentsCtx = document.getElementById('weekly-fragments-chart').getContext('2d');
+            new Chart(weeklyFragmentsCtx, {
+                type: 'line',
+                data: {
+                    labels: ['四', '五', '六', '日', '一', '二', '三'],
+                    datasets: [{
+                        label: '获得碎片数',
+                        data: [0, 0, 0, 0, 0, 14, 0],
+                        borderColor: '#FF6B6B',
+                        backgroundColor: 'rgba(255, 107, 107, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#FF6B6B',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 6,
+                        pointHoverRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 5
+                            },
+                            grid: {
+                                display: true,
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+        
+        // 重新生成任务
+        function regenerateTask() {
+            // 显示骰子动画
+            diceAnimationModal.classList.remove('hidden');
+            
+            // 1秒后隐藏动画并继续操作
+            setTimeout(() => {
+                diceAnimationModal.classList.add('hidden');
+                
+                // 筛选未完成的任务
+                const pendingTasks = userData.tasks.filter(task => task.status === 'pending');
+                
+                if (pendingTasks.length > 0) {
+                    // Fisher-Yates洗牌算法随机选择
+                    const randomIndex = Math.floor(Math.random() * pendingTasks.length);
+                    const selectedTask = pendingTasks[randomIndex];
+                    
+                    // 更新当前任务状态
+                    userData.tasks.forEach(task => {
+                        if (task.status === 'inProgress') {
+                            task.status = 'pending';
+                        }
+                    });
+                    
+                    selectedTask.status = 'inProgress';
+                    // 更新当前任务显示
+                    currentTaskEl.textContent = selectedTask.name;
+                    
+                    // 更新任务列表显示
+                    updateTaskList();
+                } else {
+                    // 如果没有待处理任务，创建一个新的随机任务
+                    const taskNames = ["学习JavaScript基础知识", "复习英语单词", "做数学题", "阅读30分钟", "练习编程题目", "写一篇日记"];
+                    const randomTask = taskNames[Math.floor(Math.random() * taskNames.length)];
+                    
+                    // 先将所有进行中任务改为待处理
+                    userData.tasks.forEach(task => {
+                        if (task.status === 'inProgress') {
+                            task.status = 'pending';
+                        }
+                    });
+                    
+                    // 创建新任务
+                    const newTask = {
+                        id: Date.now(),
+                        name: randomTask,
+                        status: 'inProgress',
+                        createTime: new Date().toISOString().split('T')[0],
+                        completeTime: null
+                    };
+                    
+                    userData.tasks.unshift(newTask);
+                    
+                    // 更新当前任务显示
+                    currentTaskEl.textContent = randomTask;
+                    
+                    // 更新任务列表
+                    updateTaskList();
+                }
+                
+                // 显示成功提示
+                showSuccessToast('新任务生成成功！');
+            }, 1000);
+        }
+        
+        // 完成任务
+        function completeTask() {
+            // 更新任务状态
+            userData.tasks.forEach(task => {
+                if (task.status === 'inProgress') {
+                    task.status = 'completed';
+                    task.completeTime = new Date().toISOString().split('T')[0];
+                    
+                    // 显示任务完成弹窗
+                    taskCompleteModal.classList.remove('hidden');
+                }
+            });
+            
+            // 更新任务列表
+            updateTaskList();
+        }
+        
+        // 显示成功提示
+        function showSuccessToast(message) {
+            const toastMessage = document.getElementById('toast-message');
+            toastMessage.textContent = message;
+            successToast.classList.remove('hidden');
+            
+            // 3秒后隐藏
+            setTimeout(() => {
+                successToast.classList.add('hidden');
+            }, 3000);
+        }
+        
+        // 更新任务列表显示，按状态排序：进行中>未完成>已完成
+        function updateTaskList() {
+            const taskList = document.getElementById('task-list');
+            
+            // 清空现有列表
+            taskList.innerHTML = '';
+            
+            // 按状态排序
+            userData.tasks.sort((a, b) => {
+                const statusOrder = { 'inProgress': 0, 'pending': 1, 'completed': 2 };
+                return statusOrder[a.status] - statusOrder[b.status];
+            });
+            
+            // 重新渲染任务列表
+            userData.tasks.forEach(task => {
+                const taskItem = document.createElement('div');
+                taskItem.className = 'bg-white rounded-xl p-4 shadow-card flex justify-between items-center';
+                taskItem.dataset.taskId = task.id; // 添加任务ID作为数据属性
+                
+                // 设置左侧边框颜色
+                if (task.status === 'inProgress') {
+                    taskItem.classList.add('border-l-4', 'border-warning');
+                } else if (task.status === 'completed') {
+                    taskItem.classList.add('border-l-4', 'border-success');
+                } else {
+                    taskItem.classList.add('border-l-4', 'border-gray-300');
+                }
+                
+                // 任务状态和名称
+                const statusClass = task.status === 'inProgress' ? 'bg-warning/20 text-warning' : 
+                                    task.status === 'completed' ? 'bg-success/20 text-success' : 
+                                    'bg-gray-200 text-gray-600';
+                
+                const statusText = task.status === 'inProgress' ? '进行中' : 
+                                  task.status === 'completed' ? '已完成' : '未开始';
+                
+                taskItem.innerHTML = `
+                    <div class="flex items-center">
+                        <span class="${statusClass} text-xs px-2 py-1 rounded-full mr-3">${statusText}</span>
+                        <span class="font-medium">${task.name}</span>
+                    </div>
+                    <div class="flex space-x-3">
+                        <button class="edit-button text-gray-500 hover:text-primary transition-colors">
+                            <i class="fa fa-pencil"></i>
+                        </button>
+                        ${task.status !== 'inProgress' ? `
+                        <button class="delete-button text-gray-500 hover:text-danger transition-colors">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                        ` : ''}
+                    </div>
+                `;
+                
+                // 添加编辑按钮事件监听
+                const editButton = taskItem.querySelector('.edit-button');
+                if (editButton) {
+                    editButton.addEventListener('click', () => {
+                        editTask(task.id);
+                    });
+                }
+                
+                // 添加删除按钮事件监听
+                const deleteButton = taskItem.querySelector('.delete-button');
+                if (deleteButton) {
+                    deleteButton.addEventListener('click', () => {
+                        // 保存当前要删除的任务ID
+                        document.getElementById('delete-confirm-modal').dataset.taskId = task.id;
+                        document.getElementById('delete-confirm-text').textContent = `确定要删除任务"${task.name}"吗？`;
+                        document.getElementById('delete-confirm-modal').classList.remove('hidden');
+                    });
+                }
+                
+                taskList.appendChild(taskItem);
+            });
+        }
+        
+        // 添加任务
+        function addTask() {
+            document.getElementById('modal-title').textContent = '添加任务';
+            document.getElementById('task-name').value = '';
+            taskModal.classList.remove('hidden');
+        }
+        
+        // 当前正在编辑的任务ID
+        let editingTaskId = null;
+        
+        // 编辑任务
+        function editTask(taskId) {
+            const task = userData.tasks.find(t => t.id === taskId);
+            if (task) {
+                editingTaskId = taskId;
+                document.getElementById('modal-title').textContent = '编辑任务';
+                document.getElementById('task-name').value = task.name;
+                taskModal.classList.remove('hidden');
+            }
+        }
+        
+        // 保存任务（添加或编辑）
+        function saveTask() {
+            const taskName = document.getElementById('task-name').value.trim();
+            if (taskName) {
+                if (editingTaskId) {
+                    // 编辑现有任务
+                    const taskIndex = userData.tasks.findIndex(t => t.id === editingTaskId);
+                    if (taskIndex !== -1) {
+                        userData.tasks[taskIndex].name = taskName;
+                        showSuccessToast('任务更新成功！');
+                    }
+                    editingTaskId = null;
+                } else {
+                    // 创建新任务
+                    const newTask = {
+                        id: Date.now(),
+                        name: taskName,
+                        status: 'pending',
+                        createTime: new Date().toISOString().split('T')[0],
+                        completeTime: null
+                    };
+                    
+                    userData.tasks.push(newTask);
+                    showSuccessToast('任务添加成功！');
+                }
+                
+                taskModal.classList.add('hidden');
+                
+                // 更新任务列表
+                updateTaskList();
+            }
+        }
+        
+        // 确认删除任务
+        function confirmDeleteTask() {
+            const taskId = parseInt(document.getElementById('delete-confirm-modal').dataset.taskId);
+            const taskIndex = userData.tasks.findIndex(t => t.id === taskId);
+            
+            if (taskIndex !== -1) {
+                userData.tasks.splice(taskIndex, 1);
+                document.getElementById('delete-confirm-modal').classList.add('hidden');
+                
+                // 更新任务列表
+                updateTaskList();
+                
+                // 显示成功提示
+                showSuccessToast('任务已删除！');
+            }
+        }
+        
+        // 取消删除任务
+        function cancelDeleteTask() {
+            document.getElementById('delete-confirm-modal').classList.add('hidden');
+        }
+        
+        // 投掷奖励骰子
+        function rollRewardDice() {
+            const remainingRolls = parseInt(remainingRollsEl.textContent);
+            if (remainingRolls <= 0) {
+                showSuccessToast('没有剩余投掷次数了，完成更多任务获取次数！');
+                return;
+            }
+            
+            // 显示骰子动画
+            diceAnimationModal.classList.remove('hidden');
+            
+            // 1秒后隐藏动画并继续操作
+            setTimeout(() => {
+                diceAnimationModal.classList.add('hidden');
+                
+                // 随机生成奖励（概率分布）
+                const rewards = [1, 1, 1, 2, 2, 3]; // 更偏向于小奖励
+                const randomReward = rewards[Math.floor(Math.random() * rewards.length)];
+                
+                // 更新碎片数量
+                userData.rewards.totalFragments += randomReward;
+                document.getElementById('total-fragments').textContent = userData.rewards.totalFragments;
+                
+                // 减少投掷次数
+                const newRemainingRolls = remainingRolls - 1;
+                remainingRollsEl.textContent = newRemainingRolls;
+                
+                // 更新使用次数统计
+                userData.diceStats.usedRolls++;
+                
+                // 显示奖励提示
+                showSuccessToast(`恭喜获得 ${randomReward} 个碎片！`);
+            }, 1000);
+        }
+        
+        // 添加奖励
+        function addReward() {
+            document.getElementById('reward-modal-title').textContent = '添加奖励';
+            document.getElementById('reward-name').value = '';
+            document.getElementById('reward-cost').value = '';
+            rewardModal.classList.remove('hidden');
+        }
+        
+        // 保存奖励
+        function saveReward() {
+            const rewardName = document.getElementById('reward-name').value.trim();
+            const rewardCost = parseInt(document.getElementById('reward-cost').value) || 30;
+            
+            if (rewardName) {
+                // 创建新奖励
+                const newReward = {
+                    id: Date.now(),
+                    name: rewardName,
+                    cost: rewardCost
+                };
+                
+                userData.rewards.rewardList.push(newReward);
+                rewardModal.classList.add('hidden');
+                
+                // 更新奖励列表UI
+                updateRewardList();
+                
+                // 显示成功提示
+                showSuccessToast('奖励添加成功！');
+            }
+        }
+        
+        // 更新奖励列表
+        function updateRewardList() {
+            const rewardListEl = document.getElementById('reward-list');
+            rewardListEl.innerHTML = '';
+            
+            userData.rewards.rewardList.forEach(reward => {
+                const rewardItem = document.createElement('div');
+                rewardItem.className = 'bg-white rounded-xl p-4 shadow-card flex justify-between items-center';
+                
+                // 判断碎片是否足够
+                const isFragmentEnough = userData.rewards.totalFragments >= reward.cost;
+                
+                // 构建奖励项内容
+                let rewardContent = `
+                    <div>
+                        <p class="font-medium">${reward.name}</p>
+                        <p class="text-gray-500 text-sm">需要 ${reward.cost} 个碎片</p>
+                    </div>`;
+                
+                // 添加兑换按钮或碎片不足提示
+                if (!isFragmentEnough) {
+                    rewardContent += `
+                        <div class="bg-warning/20 text-warning px-4 py-1.5 rounded-full text-sm font-medium flex items-center">
+                            <i class="fa fa-times-circle mr-1"></i> 碎片数量不足
+                        </div>`;
+                } else {
+                    rewardContent += `
+                        <button class="gradient-primary text-white px-4 py-1.5 rounded-full text-sm font-medium shadow-sm hover:shadow transition-all">
+                            兑换
+                        </button>`;
+                }
+                
+                rewardItem.innerHTML = rewardContent;
+                rewardListEl.appendChild(rewardItem);
+            });
+            
+            // 重新设置兑换按钮事件监听
+            setupExchangeButtons();
+        }
+        
+        // 打开兑换确认弹窗
+        function openExchangeConfirm(reward) {
+            selectedReward = reward;
+            const confirmText = `确定要消耗 ${reward.cost} 个碎片兑换${reward.name}吗？`;
+            document.getElementById('exchange-confirm-text').textContent = confirmText;
+            document.getElementById('exchange-confirm-modal').classList.remove('hidden');
+        }
+        
+        // 确认兑换
+        function confirmExchange() {
+            if (selectedReward && userData.rewards.totalFragments >= selectedReward.cost) {
+                // 扣除碎片
+                userData.rewards.totalFragments -= selectedReward.cost;
+                userData.rewards.usedFragments += selectedReward.cost;
+                
+                // 更新显示
+                document.getElementById('total-fragments').textContent = userData.rewards.totalFragments;
+                document.getElementById('used-fragments').textContent = userData.rewards.usedFragments;
+                
+                // 添加兑换记录
+                const now = new Date();
+                const formattedTime = `${now.getFullYear()}/${String(now.getMonth() + 1).padStart(2, '0')}/${String(now.getDate()).padStart(2, '0')} ${now.getHours() > 12 ? '下午' : '上午'}${String(now.getHours() % 12 || 12).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+                
+                const newHistoryItem = {
+                    id: Date.now(),
+                    rewardId: selectedReward.id,
+                    rewardName: selectedReward.name,
+                    cost: selectedReward.cost,
+                    time: formattedTime
+                };
+                
+                userData.rewards.exchangeHistory.unshift(newHistoryItem);
+                
+                // 关闭弹窗
+                document.getElementById('exchange-confirm-modal').classList.add('hidden');
+                
+                // 显示成功提示
+                showSuccessToast(`成功兑换 ${selectedReward.name}！`);
+            } else {
+                showSuccessToast('碎片数量不足！', 'error');
+                document.getElementById('exchange-confirm-modal').classList.add('hidden');
+            }
+        }
+        
+        // 取消兑换
+        function cancelExchange() {
+            document.getElementById('exchange-confirm-modal').classList.add('hidden');
+            selectedReward = null;
+        }
+        
+        // 当前选中的奖励
+        let selectedReward = null;
+        
+        // 事件监听
+        regenerateTaskBtn.addEventListener('click', regenerateTask);
+        completeTaskBtn.addEventListener('click', completeTask);
+        taskDice.addEventListener('click', regenerateTask);
+        document.getElementById('add-task').addEventListener('click', addTask);
+        document.getElementById('save-task').addEventListener('click', saveTask);
+        document.getElementById('cancel-modal').addEventListener('click', () => {
+            taskModal.classList.add('hidden');
+            // 重置编辑状态
+            editingTaskId = null;
+        });
+        document.getElementById('confirm-complete').addEventListener('click', () => {
+            taskCompleteModal.classList.add('hidden');
+        });
+        
+        // 删除确认弹窗按钮事件监听
+        document.getElementById('confirm-delete').addEventListener('click', confirmDeleteTask);
+        document.getElementById('cancel-delete').addEventListener('click', cancelDeleteTask);
+        document.getElementById('add-reward').addEventListener('click', addReward);
+        document.getElementById('save-reward').addEventListener('click', saveReward);
+        document.getElementById('cancel-reward').addEventListener('click', () => {
+            rewardModal.classList.add('hidden');
+        });
+        document.getElementById('confirm-exchange').addEventListener('click', confirmExchange);
+        document.getElementById('cancel-exchange').addEventListener('click', cancelExchange);
+        rewardDice.addEventListener('click', rollRewardDice);
+        
+        // 为兑换按钮添加事件监听
+        function setupExchangeButtons() {
+            const exchangeButtons = document.querySelectorAll('#reward-list .gradient-primary');
+            exchangeButtons.forEach((button, index) => {
+                button.addEventListener('click', () => {
+                    openExchangeConfirm(userData.rewards.rewardList[index]);
+                });
+            });
+        }
+        
+        // 初始化
+        function init() {
+            // 初始化图表
+            initCharts();
+            
+            // 计算剩余投掷次数
+            const remainingRolls = userData.diceStats.completedTasks - userData.diceStats.usedRolls;
+            remainingRollsEl.textContent = Math.max(0, remainingRolls);
+            
+            // 更新当前任务显示
+            const inProgressTask = userData.tasks.find(task => task.status === 'inProgress');
+            if (inProgressTask) {
+                currentTaskEl.textContent = inProgressTask.name;
+            }
+            
+            // 更新任务列表
+            updateTaskList();
+            
+            // 更新奖励列表并设置兑换按钮事件监听
+            updateRewardList();
+        }
+        
+        // 页面加载完成后初始化
+        window.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
