@@ -134,8 +134,8 @@
 <body class="bg-light font-sans text-dark min-h-screen flex flex-col">
     <!-- 主容器 -->
     <div id="app" class="flex-1 flex flex-col">
-        <!-- 页面内容区域 -->
-        <div id="page-content" class="flex-1 p-4">
+        <!-- 页面内容区域 - 添加底部内边距避免被固定Tab栏遮挡 -->
+        <div id="page-content" class="flex-1 p-4 pb-20">
             <!-- 任务Tab内容 -->
             <div id="tasks-tab" class="h-full flex flex-col">
                 <!-- 顶部当前任务卡片 -->
